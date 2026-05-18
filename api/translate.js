@@ -1,11 +1,9 @@
 export default async function handler(req, res) {
-  // 1. التحقق من نوع الطلب (يجب أن يكون POST فقط)
   if (req.method !== 'POST') {
     return res.status(405).json({ result: "Method Not Allowed" });
   }
 
   try {
-    // تصحيح الأقواس هنا: تم إخراج الفاصلة المنقوطة خارج القوسين
     const { text, from, to } = req.body || {};
 
     if (!text) {
@@ -29,7 +27,6 @@ export default async function handler(req, res) {
       })
     });
 
-    // التحقق من نجاح رد السيرفر
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       return res.status(response.status).json({ 
