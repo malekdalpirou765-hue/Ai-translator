@@ -1,6 +1,14 @@
 module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ result: "Method not allowed" });
+  }
+
   try {
-    const { text, from, to } = req.body || {};
+    const body = typeof req.body === "string"
+      ? JSON.parse(req.body)
+      : req.body;
+
+    const { text, from, to } = body || {};
 
     if (!text) {
       return res.status(400).json({ result: "No text provided" });
@@ -28,12 +36,12 @@ ${text}`
     const data = await response.json();
 
     return res.status(200).json({
-      result: data?.choices?.[0]?.message?.content || "Translation error"
+      result: data?.choices?.[0]?.message?.content || "No response from AI"
     });
 
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
-      result: "Server error"
+      result: "Server error: " + error.message
     });
   }
 };
