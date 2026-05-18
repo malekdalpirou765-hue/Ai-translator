@@ -202,7 +202,7 @@ export default function Home() {
             marginBottom: "20px"
           }}
         >
-          {listening ? "🔴 إيقاف التسجيل" : "🎤 تحدث للترجمة"}
+          {listening ? "🔴 Stop Recording" : "🎤 Speak to Translate"}
         </button>
 
         {result && (
@@ -233,7 +233,7 @@ export default function Home() {
               cursor: "pointer"
             }}
           >
-            🔊 استمع للترجمة
+            🔊 Listen
           </button>
         )}
       </div>
