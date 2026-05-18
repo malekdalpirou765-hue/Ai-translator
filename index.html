@@ -9,7 +9,7 @@ export default function Home() {
 
   const handleTranslate = async () => {
     if (!text.trim()) {
-      setResult("الرجاء إدخال نص للترجمة");
+      setResult("Please enter text to translate");
       return;
     }
 
@@ -17,12 +17,10 @@ export default function Home() {
     setResult("");
 
     try {
-      // الاتصال المباشر بـ OpenRouter لحل مشكلة خطأ الـ HTML
       const response = await fetch("https://openrouter.ai", {
         method: "POST",
         headers: {
-          // تنبيه مهم: ضعي مفتاح OpenRouter الخاص بكِ هنا بدلاً من الكلمة المكتوبة
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "ضعي_مفتاح_الـ_API_الخاص_بك_هنا"}`,
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "YOUR_API_KEY_HERE"}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -36,11 +34,10 @@ export default function Home() {
         })
       });
 
-      // التحقق من نجاح الطلب قبل قراءة الـ JSON لمنع خطأ Unexpected token '<'
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error Status:", response.status, errorText);
-        setResult(`خطأ من السيرفر: (كود ${response.status}) - تأكدي من صحة مفتاح الـ API والرصيد.`);
+        setResult(`Server Error: Status ${response.status}. Please check your API key.`);
         return;
       }
 
@@ -50,18 +47,17 @@ export default function Home() {
       if (translatedText) {
         setResult(translatedText);
       } else {
-        setResult("لم يتم إرجاع أي نص مترجم من الذكاء الاصطناعي.");
+        setResult("No translated text received from AI.");
       }
 
     } catch (error) {
       console.error("Translation Error:", error);
-      setResult("فشل الاتصال بالإنترنت أو حدث خطأ غير متوقع.");
+      setResult("Network error or unexpected issue occurred.");
     } finally {
       setLoading(false);
     }
   };
 
-  // دالة لتبديل اللغات عند الضغط على الأسهم
   const handleSwapLanguages = () => {
     const temp = from;
     setFrom(to);
@@ -83,11 +79,10 @@ export default function Home() {
       <div style={{ width: "100%", maxWidth: "400px" }}>
         <h1 style={{ textAlign: "center", marginBottom: "30px" }}>AI Translator</h1>
         
-        {/* صندوق إدخال النص */}
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="مرحبا"
+          placeholder="Enter text..."
           style={{
             width: "100%",
             height: "80px",
@@ -102,7 +97,6 @@ export default function Home() {
           }}
         />
 
-        {/* اختيار لغة المصدر */}
         <select
           value={from}
           onChange={(e) => setFrom(e.target.value)}
@@ -122,7 +116,6 @@ export default function Home() {
           <option value="Spanish">Spanish</option>
         </select>
 
-        {/* أزرار التبديل */}
         <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "10px" }}>
           <button onClick={handleSwapLanguages} style={{
             background: "none",
@@ -132,7 +125,6 @@ export default function Home() {
           }}>⬇️⬆️</button>
         </div>
 
-        {/* اختيار اللغة المستهدفة */}
         <select
           value={to}
           onChange={(e) => setTo(e.target.value)}
@@ -152,7 +144,6 @@ export default function Home() {
           <option value="Spanish">Spanish</option>
         </select>
 
-        {/* زر الترجمة */}
         <button
           onClick={handleTranslate}
           disabled={loading}
@@ -172,7 +163,6 @@ export default function Home() {
           {loading ? "Translating..." : "Translate"}
         </button>
 
-        {/* صندوق النتيجة أو الخطأ */}
         {result && (
           <div style={{
             backgroundColor: "#1a2a3a",
