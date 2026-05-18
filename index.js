@@ -17,7 +17,7 @@ export default function Home() {
     setResult("");
 
     try {
-      const response = await fetch("https://openrouter.ai", {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "YOUR_API_KEY_HERE"}`,
@@ -78,7 +78,7 @@ export default function Home() {
     }}>
       <div style={{ width: "100%", maxWidth: "400px" }}>
         <h1 style={{ textAlign: "center", marginBottom: "30px" }}>AI Translator</h1>
-        
+
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -87,7 +87,7 @@ export default function Home() {
             width: "100%",
             height: "80px",
             borderRadius: "8px",
-            padding: "12px",
+            padding: "8px",
             border: "none",
             backgroundColor: "#b5b5b5",
             color: "#000000",
@@ -116,14 +116,22 @@ export default function Home() {
           <option value="Spanish">Spanish</option>
         </select>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "10px" }}>
-          <button onClick={handleSwapLanguages} style={{
-            background: "none",
+        <button
+          onClick={handleSwapLanguages}
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderRadius: "8px",
+            backgroundColor: "#1e3a5f",
+            color: "#ffffff",
             border: "none",
+            fontSize: "16px",
             cursor: "pointer",
-            fontSize: "20px"
-          }}>⬇️⬆️</button>
-        </div>
+            marginBottom: "10px"
+          }}
+        >
+          ⇅ Swap Languages
+        </button>
 
         <select
           value={to}
@@ -135,11 +143,11 @@ export default function Home() {
             backgroundColor: "#b5b5b5",
             border: "none",
             fontSize: "16px",
-            marginBottom: "20px"
+            marginBottom: "15px"
           }}
         >
-          <option value="English">English</option>
           <option value="Arabic">Arabic</option>
+          <option value="English">English</option>
           <option value="French">French</option>
           <option value="Spanish">Spanish</option>
         </select>
@@ -149,14 +157,13 @@ export default function Home() {
           disabled={loading}
           style={{
             width: "100%",
-            padding: "12px",
+            padding: "14px",
             borderRadius: "8px",
-            backgroundColor: "#1e6091",
+            backgroundColor: loading ? "#555" : "#2563eb",
             color: "#ffffff",
             border: "none",
             fontSize: "16px",
-            fontWeight: "bold",
-            cursor: "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
             marginBottom: "20px"
           }}
         >
@@ -165,17 +172,16 @@ export default function Home() {
 
         {result && (
           <div style={{
-            backgroundColor: "#1a2a3a",
+            backgroundColor: "#1e3a5f",
             padding: "15px",
             borderRadius: "8px",
             fontSize: "16px",
-            lineHeight: "1.5",
-            border: "1px solid #2e3f50"
+            lineHeight: "1.5"
           }}>
             {result}
           </div>
         )}
       </div>
     </div>
-  );.
+  );
 }
