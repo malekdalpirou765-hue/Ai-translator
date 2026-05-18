@@ -1,4 +1,9 @@
 export default async function handler(req, res) {
+  // 1. التحقق من نوع الطلب (يجب أن يكون POST فقط)
+  if (req.method !== 'POST') {
+    return res.status(405).json({ result: "Method Not Allowed" });
+  }
+
   try {
     const { text, from, to } = req.body || {};
 
@@ -17,11 +22,19 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "user",
-            content: `Translate from ${from} to ${to}:\n\n${text}`
+            content: `Translate from ${from || 'auto'} to ${to || 'English'}:\n\n${text}`
           }
         ]
       })
     });
+
+    // 2. الخطأ الأكبر: يجب التحقق من نجاح طلب الـ API أولاً قبل تحويله لـ JSON
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      return res.status(response.status).json({ 
+        result: errorData?.error?.message || "OpenRouter API Error" 
+      });
+    }
 
     const data = await response.json();
 
