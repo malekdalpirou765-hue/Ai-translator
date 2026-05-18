@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -6,9 +6,25 @@ export default function Home() {
   const [to, setTo] = useState("English");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef(null);
 
-  const handleTranslate = async () => {
-    if (!text.trim()) {
+  const languages = ["Arabic", "English", "French", "Spanish", "German", "Italian", "Turkish", "Chinese"];
+
+  const langCodes = {
+    Arabic: "ar-SA",
+    English: "en-US",
+    French: "fr-FR",
+    Spanish: "es-ES",
+    German: "de-DE",
+    Italian: "it-IT",
+    Turkish: "tr-TR",
+    Chinese: "zh-CN"
+  };
+
+  const handleTranslate = async (inputText) => {
+    const t = inputText || text;
+    if (!t.trim()) {
       setResult("Please enter text to translate");
       return;
     }
@@ -20,11 +36,13 @@ export default function Home() {
       const res = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, from, to })
+        body: JSON.stringify({ text: t, from, to })
       });
 
       const data = await res.json();
-      setResult(data.result || "No translation received.");
+      const translation = data.result || "No translation received.";
+      setResult(translation);
+      speakText(translation);
     } catch (error) {
       setResult("Something went wrong. Please try again.");
     } finally {
@@ -32,13 +50,56 @@ export default function Home() {
     }
   };
 
+  const speakText = (text) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = langCodes[to] || "en-US";
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("متصفحك لا يدعم التعرف على الصوت");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = langCodes[from] || "ar-SA";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+
+    recognition.onresult = (event) => {
+      const spoken = event.results[0][0].transcript;
+      setText(spoken);
+      handleTranslate(spoken);
+    };
+
+    recognition.onerror = () => {
+      setListening(false);
+      setResult("لم يتم التعرف على الصوت، حاول مرة أخرى");
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    setListening(false);
+  };
+
   const swap = () => {
     const temp = from;
     setFrom(to);
     setTo(temp);
   };
-
-  const languages = ["Arabic", "English", "French", "Spanish", "German", "Italian", "Turkish", "Chinese"];
 
   return (
     <div style={{
@@ -110,7 +171,7 @@ export default function Home() {
         </div>
 
         <button
-          onClick={handleTranslate}
+          onClick={() => handleTranslate()}
           disabled={loading}
           style={{
             width: "100%",
@@ -121,10 +182,27 @@ export default function Home() {
             border: "none",
             fontSize: "18px",
             cursor: loading ? "not-allowed" : "pointer",
-            marginBottom: "20px"
+            marginBottom: "10px"
           }}
         >
           {loading ? "Translating..." : "Translate"}
+        </button>
+
+        <button
+          onClick={listening ? stopListening : startListening}
+          style={{
+            width: "100%",
+            padding: "14px",
+            borderRadius: "8px",
+            backgroundColor: listening ? "#dc2626" : "#16a34a",
+            color: "#fff",
+            border: "none",
+            fontSize: "18px",
+            cursor: "pointer",
+            marginBottom: "20px"
+          }}
+        >
+          {listening ? "🔴 إيقاف التسجيل" : "🎤 تحدث للترجمة"}
         </button>
 
         {result && (
@@ -134,10 +212,29 @@ export default function Home() {
             borderRadius: "8px",
             fontSize: "16px",
             lineHeight: "1.6",
-            whiteSpace: "pre-wrap"
+            whiteSpace: "pre-wrap",
+            marginBottom: "10px"
           }}>
             {result}
           </div>
+        )}
+
+        {result && (
+          <button
+            onClick={() => speakText(result)}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              backgroundColor: "#7c3aed",
+              color: "#fff",
+              border: "none",
+              fontSize: "16px",
+              cursor: "pointer"
+            }}
+          >
+            🔊 استمع للترجمة
+          </button>
         )}
       </div>
     </div>
