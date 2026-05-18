@@ -17,38 +17,16 @@ export default function Home() {
     setResult("");
 
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await fetch("/api/translate", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "YOUR_API_KEY_HERE"}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model: "openai/gpt-4o-mini",
-          messages: [
-            {
-              role: "user",
-              content: `Translate from ${from} to ${to}:\n\n${text}`
-            }
-          ]
-        })
+        body: JSON.stringify({ text, from, to })
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API Error Status:", response.status, errorText);
-        setResult(`Server Error: Status ${response.status}. Please check your API key.`);
-        return;
-      }
-
       const data = await response.json();
-      const translatedText = data?.choices?.[0]?.message?.content;
-
-      if (translatedText) {
-        setResult(translatedText);
-      } else {
-        setResult("No translated text received from AI.");
-      }
+      setResult(data.result || "No translated text received.");
 
     } catch (error) {
       console.error("Translation Error:", error);
