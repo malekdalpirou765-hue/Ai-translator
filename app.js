@@ -20,9 +20,10 @@ async function translateText() {
     });
 
     const data = await res.json();
-
     resultBox.innerText = data.result || "No result";
+
   } catch (error) {
-    resultBox.innerText = "Error connecting to server";
+    console.error("Error:", error);
+    resultBox.innerText = "An error occurred.";
   }
 }
