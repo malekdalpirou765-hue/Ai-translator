@@ -1,11 +1,11 @@
-module.exports = async (req, res) => {
-  const { text, from, to } = req.body;
-
-  if (!text) {
-    return res.status(400).json({ result: "No text provided" });
-  }
-
+export default async function handler(req, res) {
   try {
+    const { text, from, to } = req.body || {};
+
+    if (!text) {
+      return res.status(400).json({ result: "No text provided" });
+    }
+
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -28,10 +28,12 @@ ${text}`
     const data = await response.json();
 
     return res.status(200).json({
-      result: data.choices?.[0]?.message?.content || "Error"
+      result: data?.choices?.[0]?.message?.content || "Translation error"
     });
 
-  } catch (error) {
-    return res.status(500).json({ result: "Server error" });
+  } catch (err) {
+    return res.status(500).json({
+      result: "Server error"
+    });
   }
-};
+}
