@@ -233,7 +233,7 @@ export default function Home() {
               cursor: "pointer"
             }}
           >
-            🔊 Listen
+            🔊 Listen to Translation
           </button>
         )}
       </div>
