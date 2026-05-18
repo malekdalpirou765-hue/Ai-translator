@@ -28,10 +28,10 @@ ${text}`
     const data = await response.json();
 
     return res.status(200).json({
-      result: data?.choices?.[0]?.message?.content
+      result: data?.choices?.[0]?.message?.content || "Translation error"
     });
 
-  } catch (error) {
+  } catch (err) {
     return res.status(500).json({
       result: "Server error"
     });
