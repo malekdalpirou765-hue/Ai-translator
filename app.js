@@ -16,7 +16,7 @@ async function translateText() {
     })
   });
 
-  const data = await res.json();
+  const data = await res.json();.
 
   document.getElementById("result").innerText =
     data.result || "Error";
