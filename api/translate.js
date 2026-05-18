@@ -5,13 +5,14 @@ export default async function handler(req, res) {
   }
 
   try {
+    // تصحيح الأقواس هنا: تم إخراج الفاصلة المنقوطة خارج القوسين
     const { text, from, to } = req.body || {};
 
     if (!text) {
       return res.status(400).json({ result: "No text provided" });
     }
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY_V2}`,
@@ -28,7 +29,7 @@ export default async function handler(req, res) {
       })
     });
 
-    // 2. الخطأ الأكبر: يجب التحقق من نجاح طلب الـ API أولاً قبل تحويله لـ JSON
+    // التحقق من نجاح رد السيرفر
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       return res.status(response.status).json({ 
