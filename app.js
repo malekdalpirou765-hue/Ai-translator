@@ -1,41 +1,23 @@
 async function translateText() {
 
-const text =
-document.getElementById("text").value;
+  const text = document.getElementById("text").value;
+  const from = document.getElementById("from").value;
+  const to = document.getElementById("to").value;
 
-const response = await fetch(
-"https://openrouter.ai/api/v1/chat/completions",
-{
-method: "POST",
+  const res = await fetch("/api/translate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text,
+      from,
+      to
+    })
+  });
 
-headers: {
-"Authorization":
-"Bearer YOUR_API_KEY",
+  const data = await res.json();
 
-"Content-Type":
-"application/json"
-},
-
-body: JSON.stringify({
-
-model: "openai/gpt-4o-mini",
-
-messages: [
-{
-role: "user",
-
-content:
-`Translate this to English:
-${text}`
-}
-]
-})
-}
-);
-
-const data = await response.json();
-
-document.getElementById("result").innerText =
-data.choices[0].message.content;
-
+  document.getElementById("result").innerText =
+    data.result || "Error";
 }
