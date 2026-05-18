@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const { text, from, to } = req.body || {};
 
@@ -17,9 +17,7 @@ module.exports = async (req, res) => {
         messages: [
           {
             role: "user",
-            content: `Translate from ${from} to ${to}:
-
-${text}`
+            content: `Translate from ${from} to ${to}:\n\n${text}`
           }
         ]
       })
@@ -31,9 +29,9 @@ ${text}`
       result: data?.choices?.[0]?.message?.content || "NO RESPONSE"
     });
 
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
-      result: err.message || "Server error"
+      result: error.message || "Server error"
     });
   }
-};
+}
