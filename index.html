@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Translator</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    textarea, select {
+      width: 320px;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1e293b;
+      width: 320px;
+      border-radius: 8px;
+      min-height: 60px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>AI Translator</h2>
+
+  <textarea id="text" placeholder="اكتب النص هنا..."></textarea>
+
+  <select id="from">
+    <option value="Arabic">Arabic</option>
+    <option value="English">English</option>
+    <option value="French">French</option>
+    <option value="Spanish">Spanish</option>
+  </select>
+
+  <div>⬇️⬆️</div>
+
+  <select id="to">
+    <option value="English">English</option>
+    <option value="French">French</option>
+    <option value="Arabic">Arabic</option>
+    <option value="Spanish">Spanish</option>
+  </select>
+
+  <button onclick="translateText()">Translate</button>
+
+  <div id="result">Result will appear here...</div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
