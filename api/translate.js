@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     const { text, from, to } = req.body || {};
 
@@ -36,4 +36,4 @@ ${text}`
       result: "Server error"
     });
   }
-}
+};
