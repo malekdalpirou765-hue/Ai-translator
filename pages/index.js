@@ -7,7 +7,9 @@ export default function Home() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const recognitionRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const languages = ["Arabic", "English", "French", "Spanish", "German", "Italian", "Turkish", "Chinese"];
 
@@ -50,6 +52,38 @@ export default function Home() {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImageLoading(true);
+    setResult("");
+    setText("");
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("/api/ocr", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.text) {
+        setText(data.text);
+        handleTranslate(data.text);
+      } else {
+        setResult("Could not read text from image. Please try another image.");
+      }
+    } catch (error) {
+      setResult("Error reading image. Please try again.");
+    } finally {
+      setImageLoading(false);
+    }
+  };
+
   const speakText = (text) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -61,7 +95,7 @@ export default function Home() {
   const startListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("متصفحك لا يدعم التعرف على الصوت");
+      alert("Your browser does not support voice recognition");
       return;
     }
 
@@ -81,7 +115,7 @@ export default function Home() {
 
     recognition.onerror = () => {
       setListening(false);
-      setResult("لم يتم التعرف على الصوت، حاول مرة أخرى");
+      setResult("Could not recognize voice. Please try again.");
     };
 
     recognitionRef.current = recognition;
@@ -199,11 +233,38 @@ export default function Home() {
             border: "none",
             fontSize: "18px",
             cursor: "pointer",
-            marginBottom: "20px"
+            marginBottom: "10px"
           }}
         >
           {listening ? "🔴 Stop Recording" : "🎤 Speak to Translate"}
         </button>
+
+        <button
+          onClick={() => fileInputRef.current.click()}
+          disabled={imageLoading}
+          style={{
+            width: "100%",
+            padding: "14px",
+            borderRadius: "8px",
+            backgroundColor: imageLoading ? "#444" : "#d97706",
+            color: "#fff",
+            border: "none",
+            fontSize: "18px",
+            cursor: imageLoading ? "not-allowed" : "pointer",
+            marginBottom: "20px"
+          }}
+        >
+          {imageLoading ? "Reading Image..." : "📷 Translate from Image"}
+        </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleImageUpload}
+          style={{ display: "none" }}
+        />
 
         {result && (
           <div style={{
